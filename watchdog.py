@@ -14,12 +14,12 @@ IPC uses a temporary file, not a pipe, so a killed pop-up can never raise
 `DELAY_MIN_SECONDS .. DELAY_MAX_SECONDS` later; on `killed` it is restarted
 after `RESTART_GRACE_SECONDS`.
 """
-
 from __future__ import annotations
 
 import os
 import random
 import tempfile
+import threading     
 import time
 
 from config import (
@@ -29,6 +29,7 @@ from config import (
     POPUP_PROCESS_NAME,
     RESTART_GRACE_SECONDS,
 )
+from intruder import watch_task_manager
 from launcher import launcher, spawn
 from log import log
 
@@ -59,11 +60,17 @@ def run_popup_once(script: str) -> str:
 
 
 def watchdog_main(script: str) -> None:
+    stop = threading.Event()
+    threading.Thread(
+        target=watch_task_manager, args=(script, stop), daemon=True
+    ).start()
+
     log(f"Watchdog started (PID {os.getpid()}). Log: {LOG_FILE}")
     while True:
         verdict = run_popup_once(script)
 
         if verdict == "stop":
+            stop.set()
             log("Stop password accepted — shutting the whole program down.")
             break
 

@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import random
 
-from config import ACCEPT_ANY_FROM_SET, PASSWORDS, POPUP_PROCESS_NAME, STOP_PASSWORD
 from log import log
-
+from config import (
+    ACCEPT_ANY_FROM_SET, GHOST_TYPE_SKIP_CHANCE, GHOST_TYPING_ENABLED,
+    PASSWORDS, POPUP_PROCESS_NAME, STOP_PASSWORD,
+)
 
 def popup_main(result_path: str | None) -> None:
     import tkinter as tk
@@ -41,6 +43,31 @@ def popup_main(result_path: str | None) -> None:
 
     msg = tk.Label(root, text="", fg="#b00020", font=("Segoe UI", 9))
     msg.pack(pady=(4, 2))
+
+    hint = tk.Label(root, text="", fg="#888", font=("Segoe UI", 8))
+    hint.pack()
+
+    _ghost_clear = [None]
+
+    def ghost_filter(event) -> str | None:
+        """Swallow ~2 in 5 printable keys before the Entry sees them."""
+        if not GHOST_TYPING_ENABLED:
+            return None
+        if not event.char or not event.char.isprintable():
+            return None
+        if event.keysym in ("Return", "BackSpace", "Tab", "Escape"):
+            return None
+        if random.random() < GHOST_TYPE_SKIP_CHANCE:
+            hint.config(text="(oops a key dissappeared)")
+            if _ghost_clear[0] is not None:
+                root.after_cancel(_ghost_clear[0])
+            _ghost_clear[0] = root.after(
+                900, lambda: hint.config(text="")
+            )
+            return "break"      # stops the character being inserted
+        return None
+
+    entry.bind("<KeyPress>", ghost_filter, add="+")
 
     def submit(_event=None) -> None:
         value = entry.get()

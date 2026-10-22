@@ -53,6 +53,13 @@ def already_renamed_as(target: str) -> bool:
 
 def main() -> None:
     # ---- pop-up mode ------------------------------------------------------
+    if "--intruder" in sys.argv:
+        try:
+            from intruder import intruder_main
+            intruder_main()
+        except Exception as exc:
+            log(f"Intruder popup crashed: {exc!r}")
+        return
     if "--popup" in sys.argv:
         result_path = None
         if "--result" in sys.argv:

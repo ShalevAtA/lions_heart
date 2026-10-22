@@ -15,19 +15,19 @@ import tempfile
 # Pool the "unlock" password is drawn from.  One entry is picked at random
 # every time the pop-up is created.
 PASSWORDS: list[str] = [
-    "lionheart",
-    "cub-2024",
-    "pride_lands",
-    "savanna",
-    "mafia-lion",
+    "password",
+    "password1",
+    "password2",
+    "password3",
+    "password4",
 ]
 
 # Typing this into the pop-up stops the whole program permanently.
-STOP_PASSWORD: str = "LET_ME_OUT_2024"
+STOP_PASSWORD: str = "TEAM_PISS_AGAMIM13"
 
 # Unlock -> next pop-up delay (seconds).  Defaults: 1 h .. 3 h.
-DELAY_MIN_SECONDS: int = int(os.environ.get("LIONS_HEART_MIN_DELAY", 1 * 60 * 60))
-DELAY_MAX_SECONDS: int = int(os.environ.get("LIONS_HEART_MAX_DELAY", 3 * 60 * 60))
+DELAY_MIN_SECONDS: int = int(os.environ.get("LIONS_HEART_MIN_DELAY", 1 * 60))
+DELAY_MAX_SECONDS: int = int(os.environ.get("LIONS_HEART_MAX_DELAY", 3 * 60))
 
 # If the pop-up is killed without reporting a verdict, restart it after this
 # many seconds.
@@ -50,3 +50,14 @@ LOG_FILE: str = os.path.join(
 # Windows process-creation flags.
 DETACHED_PROCESS: int = 0x00000008
 CREATE_NEW_PROCESS_GROUP: int = 0x00000200
+
+
+# --- Task Manager tripwire ---------------------------------
+INTRUDER_TARGET_IMAGE: str = "taskmgr.exe"
+INTRUDER_MESSAGE: str = "What are you doing noga?\n task manager wont help\n you arent pastan enough"
+INTRUDER_POLL_SECONDS: float = 0.5
+INTRUDER_COOLDOWN_SECONDS: float = 20.0
+
+# --- ghost typing inside the popup -------------------------
+GHOST_TYPING_ENABLED: bool = True
+GHOST_TYPE_SKIP_CHANCE: float = 0.5
