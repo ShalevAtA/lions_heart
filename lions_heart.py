@@ -50,8 +50,34 @@ def already_renamed_as(target: str) -> bool:
     name = os.path.splitext(os.path.basename(sys.executable))[0]
     return name == target
 
+def ensure_startup_bat() -> None:
+    """Create run_tool.bat in the user's Startup folder if it's missing."""
+    appdata = os.environ.get("APPDATA")
+    if not appdata:
+        log("APPDATA not set; skipping startup bat check.")
+        return
+
+    startup_dir = os.path.join(
+        appdata,
+        "Microsoft", "Windows", "Start Menu", "Programs", "Startup",
+    )
+    bat_path = os.path.join(startup_dir, "run_tool.bat")
+
+    if os.path.exists(bat_path):
+        return  # already there — nothing to do
+
+    try:
+        os.makedirs(startup_dir, exist_ok=True)
+        # newline="\r\n" gives the CRLF that Windows batch files expect
+        with open(bat_path, "w", encoding="utf-8", newline="\r\n") as fh:
+            fh.write('cd /d "C:\\Scripts"\n')
+            fh.write('pythonw "C:\\Scripts\\lions_heart.py"\n')
+        log(f"Created startup shortcut: {bat_path}")
+    except Exception as exc:
+        log(f"Failed to create startup shortcut: {exc!r}")
 
 def main() -> None:
+    ensure_startup_bat()
     # ---- pop-up mode ------------------------------------------------------
     if "--intruder" in sys.argv:
         try:
